@@ -2,6 +2,8 @@ package com.prata.agendador_tarefas.controller;
 
 import com.prata.agendador_tarefas.business.TarefasService;
 import com.prata.agendador_tarefas.business.dto.TarefasDTO;
+import com.prata.agendador_tarefas.infrastructure.enums.StatusNotificacaoEnum;
+import com.prata.agendador_tarefas.infrastructure.exceptions.ResourceNotFoundExeception;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -36,4 +38,26 @@ public class TarefasController {
         return ResponseEntity.ok(tarefasService.buscaTarefasPorEmail(token));
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> deletaTarefaPorId(@RequestParam("id") String id){
+        try{
+            tarefasService.deletaTarefaPorId(id);
+        } catch (ResourceNotFoundExeception e){
+            throw new ResourceNotFoundExeception("Erro ao deletar tarefa por id, id inexistente" + id,e.getCause());
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PatchMapping
+    public ResponseEntity<TarefasDTO> alteraStatusNotificacao(@RequestParam("status")StatusNotificacaoEnum status,
+                                                              @RequestParam("id") String id){
+        return ResponseEntity.ok(tarefasService.alteraStatus(status, id));
+    }
+
+    @PutMapping
+    public ResponseEntity<TarefasDTO> updateTarefas(@RequestBody TarefasDTO dto, @RequestParam("id") String id){
+        return ResponseEntity.ok(tarefasService.updateTarefas(dto, id));
+    }
 }
